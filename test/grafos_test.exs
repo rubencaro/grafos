@@ -4,5 +4,6 @@ defmodule GrafosTest do
 
   test "the truth" do
     assert 1 + 1 == 2
+    Grafos.bogus
   end
 end
