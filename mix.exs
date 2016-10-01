@@ -10,7 +10,8 @@ defmodule Grafos.Mixfile do
      start_permanent: Mix.env == :prod,
      deps: deps(),
      test_coverage: [tool: Grafos.Cover, ignored: [Grafos.Helpers]],
-     aliases: aliases]
+     aliases: aliases,
+     dialyzer: [plt_add_deps: :transitive]]
   end
 
   def application do
@@ -18,7 +19,8 @@ defmodule Grafos.Mixfile do
   end
 
   defp deps do
-    [{:credo, "~> 0.4", only: [:dev, :test]}]
+    [{:credo, "~> 0.4", only: [:dev, :test]},
+     {:dialyxir, "~> 0.3.5", only: [:dev, :test]}]
   end
 
   # Specifies which paths to compile per environment.
@@ -26,6 +28,6 @@ defmodule Grafos.Mixfile do
   defp elixirc_paths(_),     do: ["lib"]
 
   defp aliases do
-    [test: ["test --cover", "credo"]]
+    [test: ["test --cover", "credo", "dialyzer"]]
   end
 end

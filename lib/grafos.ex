@@ -3,8 +3,4 @@ defmodule Grafos do
   See README.md
   """
 
-  def bogus do
-    IO.puts "yeah"
-  end
-
 end
