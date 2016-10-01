@@ -27,7 +27,7 @@ defmodule Grafos.Cover do
   ```
   """
 
-  defstruct [:rate, :not_covered, :errors]
+  defstruct [:rate, :not_covered, :errors, :opts]
 
   def start(compile_path, opts) do
     Mix.shell.info "Cover compiling modules ..."
@@ -42,7 +42,7 @@ defmodule Grafos.Cover do
 
     fn() ->
       msg = opts |> get_results |> format_results
-      Mix.shell.info "\nCover results ... #{msg}\n"
+      Mix.shell.info "\nCover results ... #{msg}"
     end
   end
 
@@ -53,6 +53,7 @@ defmodule Grafos.Cover do
 
     int = ok
       |> Enum.reject(&match?({{_, 0},_},&1))  # ignore line 0 results
+      |> Enum.uniq_by(fn({ml,_}) -> ml end)   # unique for each line
     nc = int
       |> Enum.filter(fn({_, {_, n}}) -> n > 0 end)  # only those with any non covered results
 
@@ -60,7 +61,7 @@ defmodule Grafos.Cover do
     nc_count = nc |> Enum.count
     rate = (total - nc_count) / total
 
-    %Grafos.Cover{rate: rate, not_covered: nc, errors: fail}
+    %Grafos.Cover{rate: rate, not_covered: nc, errors: fail, opts: opts}
   end
 
   defp get_modules(opts) do
@@ -72,10 +73,28 @@ defmodule Grafos.Cover do
   end
 
   defp format_results(%Grafos.Cover{} = data) do
-    [:bright, "#{data.rate * 100.0 |> Float.round(2)}% coverage\n", :normal]
-    |> add_not_covered(data.not_covered)
-    |> add_errors(data.errors)
-    |> IO.ANSI.format
+    rate = Float.round(data.rate * 100.0, 2)
+    msg = [:bright, rate_color(rate), "#{rate}% coverage\n", :normal]
+
+    if data.opts[:verbose] do
+      msg
+      |> add_not_covered(data.not_covered)
+      |> add_errors(data.errors)
+      |> IO.ANSI.format
+    else
+      msg |> IO.ANSI.format
+    end
+  end
+
+  # red until 50%
+  # from red to greenish from 50 to 99%
+  # green only for 100%
+  defp rate_color(100.0), do: :green
+  defp rate_color(r) when r < 50.0, do: :red
+  defp rate_color(rate) do
+    r = round((150.0 - rate) / 20.0)
+    g = round((rate - 50) / 20.0)
+    IO.ANSI.color(r, g, 0)
   end
 
   defp add_not_covered(output, not_covered) do
