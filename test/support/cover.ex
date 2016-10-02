@@ -30,7 +30,9 @@ defmodule Grafos.Cover do
   defstruct [:rate, :not_covered, :errors, :opts]
 
   def start(compile_path, opts) do
-    Mix.shell.info "Cover compiling modules ..."
+    {parsed, _, _} = System.argv |> OptionParser.parse(strict: [verbose_cover: :boolean])
+    opts = opts |> Keyword.merge(parsed)
+
     _ = :cover.start
 
     case :cover.compile_beam_directory(compile_path |> to_charlist) do
@@ -76,7 +78,7 @@ defmodule Grafos.Cover do
     rate = Float.round(data.rate * 100.0, 2)
     msg = [:bright, rate_color(rate), "#{rate}% coverage\n", :normal]
 
-    if data.opts[:verbose] do
+    if data.opts[:verbose] || data.opts[:verbose_cover] do
       msg
       |> add_not_covered(data.not_covered)
       |> add_errors(data.errors)
