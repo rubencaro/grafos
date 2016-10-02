@@ -11,7 +11,7 @@ defmodule Grafos.Mixfile do
      deps: deps(),
      test_coverage: [tool: Grafos.Cover, ignored: [Grafos.Helpers]],
      aliases: aliases,
-     dialyzer: [plt_add_deps: :transitive]]
+     dialyzer: [plt_add_deps: :transitiv, flags: ["-Wunmatched_returns","-Werror_handling","-Wrace_conditions", "-Wunderspecs", "-q"]]]
   end
 
   def application do
