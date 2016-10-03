@@ -1,3 +1,4 @@
+
 defmodule Grafos.Graph.Attributes do
   @moduledoc """
   Module holding all possible `Graph` attributes

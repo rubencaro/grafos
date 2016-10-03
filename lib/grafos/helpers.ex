@@ -156,4 +156,9 @@ defmodule Grafos.Helpers do
       x -> x
     end
   end
+
+  @doc """
+  Pipeable version of `Kernel.struct/2`
+  """
+  def to_struct(data, struct), do: struct(struct, data)
 end
